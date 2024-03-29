@@ -39,8 +39,8 @@ export async function fetchLatestInvoices() {
   noStore();
 
   try {
-    // console.log('Fetching latest invoices data...');
-    // await new Promise((resolve) => setTimeout(resolve, 3000));
+    console.log('Fetching latest invoices data...');
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     const data = await sql<LatestInvoiceRaw>`
       SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id
@@ -49,7 +49,7 @@ export async function fetchLatestInvoices() {
       ORDER BY invoices.date DESC
       LIMIT 5`;
 
-    // console.log('Latest Invoices data fetch completed after 3 seconds.');
+    console.log('Latest Invoices data fetch completed after 3 seconds.');
 
     const latestInvoices = data.rows.map((invoice) => ({
       ...invoice,
