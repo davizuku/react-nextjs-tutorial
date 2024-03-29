@@ -2,7 +2,9 @@ import { Card } from '@/app/ui/dashboard/cards';
 import RevenueChart from '@/app/ui/dashboard/revenue-chart';
 import LatestInvoices from '@/app/ui/dashboard/latest-invoices';
 import { lusitana } from '@/app/ui/fonts';
-import { fetchCardData, fetchLatestInvoices, fetchRevenue } from '../lib/data';
+import { fetchCardData, fetchLatestInvoices } from '../../lib/data';
+import { Suspense } from 'react';
+import { RevenueChartSkeleton } from '@/app/ui/skeletons';
 
 // Note: unstable_noStore is an experimental API and may change in the future. If you prefer to use a stable API in your
 // own projects, you can also use the Segment Config Option export const dynamic = "force-dynamic".
@@ -11,7 +13,6 @@ import { fetchCardData, fetchLatestInvoices, fetchRevenue } from '../lib/data';
 
 export default async function Page() {
     const waterfall = false;
-    let revenue = [];
     let latestInvoices = [];
     let numberOfCustomers = 0;
     let numberOfInvoices = 0;
@@ -19,7 +20,6 @@ export default async function Page() {
     let totalPendingInvoices = '';
 
     if (waterfall) {
-        revenue = await fetchRevenue();
         latestInvoices = await fetchLatestInvoices();
         ({
             numberOfCustomers,
@@ -29,7 +29,6 @@ export default async function Page() {
         } = await fetchCardData());
     } else {
         [
-            revenue,
             latestInvoices,
             {
                 numberOfCustomers,
@@ -38,7 +37,6 @@ export default async function Page() {
                 totalPendingInvoices,
             }
         ] = await Promise.all([
-            fetchRevenue(),
             fetchLatestInvoices(),
             fetchCardData(),
         ]);
@@ -60,7 +58,9 @@ export default async function Page() {
                 />
             </div>
             <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8">
-                <RevenueChart revenue={revenue}  />
+                <Suspense fallback={<RevenueChartSkeleton/>}>
+                    <RevenueChart/>
+                </Suspense>
                 <LatestInvoices latestInvoices={latestInvoices} />
             </div>
         </main>
